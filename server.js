@@ -31,8 +31,8 @@ app.get("/api/getUsers", async (req, res) => {
   }
 });
 
-// Register New User
-app.post("/api/user/newUser", async (req, res) => {
+// User Login
+app.post("/api/user/login", async (req, res) => {
   const { email, given_name, family_name } = req.body;
 
   try {
@@ -41,18 +41,21 @@ app.post("/api/user/newUser", async (req, res) => {
     ); // Check if the user already exists in the database
     if (data.rows.length > 0) {
       console.log("user exists");
-      res.send("The user already exists");
+      res.json({ message: "succefully logged in", user: data.rows[0] });
     } else {
       const joined = new Date().toISOString();
       await pool.query(
         `INSERT INTO users (email, family_name, given_name, joined) 
         VALUES ('${email}', '${family_name}', '${given_name}', '${joined}')`
       );
-      res.send("New user was successfully added.");
+      res.json({
+        message: "new user added and successfully logged in",
+        user: { email, family_name, given_name, joined },
+      });
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send("Failed to add new User");
+    res.status(500).send("Failed to login");
   }
 });
 
