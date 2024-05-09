@@ -1,0 +1,8 @@
+users (
+    userId Primary Key NOT NULL,
+    email VARCHAR NOT NULL,
+    givenName VARCHAR,
+    familyName VARCHAR,
+    joined DATE,
+    pr JSONB
+)
