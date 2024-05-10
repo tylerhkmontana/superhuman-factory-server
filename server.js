@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const port = process.env.PORT || 8080;
 const cors = require("cors");
-require("dotenv").config();
+const path = require("path");
 
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
@@ -13,13 +13,14 @@ var corsOptions = {
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
+app.use(express.static(path.join(__dirname, "dist")));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
-
-app.get("/", (req, res) => {
-  res.send("hello world");
-});
 
 app.get("/api/getUsers", async (req, res) => {
   try {
@@ -74,6 +75,11 @@ app.put("/api/user/updatePr", async (req, res) => {
     console.log(error);
     res.status(500).send("Failed to update the PR");
   }
+});
+
+app.get("*", (req, res) => {
+  console.log("test");
+  res.sendFile(path.join(__dirname, "dist", "index.html"));
 });
 
 app.listen(port, () => console.log(`server running on port:${port}`));
