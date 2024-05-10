@@ -4,6 +4,10 @@ const port = process.env.PORT || 8080;
 const cors = require("cors");
 const path = require("path");
 
+if (process.env.NODE_ENV !== "production") {
+  require("dotenv").config();
+}
+
 const bodyParser = require("body-parser");
 const { Pool } = require("pg");
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -12,10 +16,6 @@ var corsOptions = {
   origin: "*",
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
-
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
 
 app.use(express.static(path.join(__dirname, "dist")));
 app.use(bodyParser.json());
@@ -35,6 +35,7 @@ app.get("/api/getUsers", async (req, res) => {
 // User Login
 app.post("/api/user/login", async (req, res) => {
   const { email, given_name, family_name } = req.body;
+  console.log(req.body);
 
   try {
     const data = await pool.query(
