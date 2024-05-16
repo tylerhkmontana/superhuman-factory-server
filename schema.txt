@@ -1,8 +1,11 @@
 users (
     userId Primary Key NOT NULL,
     email VARCHAR NOT NULL,
-    givenName VARCHAR,
-    familyName VARCHAR,
+    givenName VARCHAR NOT NULL,
+    familyName VARCHAR NOT NULL,
+    gender VARCHAR NOT NULL,
+    wegith FLOAT4 NOT NULL,
+    dob DATE,
+    pr JSONB,
     joined DATE,
-    pr JSONB
 )

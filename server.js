@@ -42,17 +42,16 @@ app.post("/api/user/login", async (req, res) => {
       `SELECT * FROM users WHERE email = '${email}';`
     ); // Check if the user already exists in the database
     if (data.rows.length > 0) {
-      console.log("user exists");
-      res.json({ message: "succefully logged in", user: data.rows[0] });
-    } else {
-      const joined = new Date().toISOString();
-      await pool.query(
-        `INSERT INTO users (email, family_name, given_name, joined) 
-        VALUES ('${email}', '${family_name}', '${given_name}', '${joined}')`
-      );
       res.json({
-        message: "new user added and successfully logged in",
-        user: { email, family_name, given_name, joined },
+        message: "succefully logged in",
+        user: data.rows[0],
+        isRegistered: true,
+      });
+    } else {
+      res.json({
+        message: "need to register the user",
+        user: { email, given_name, family_name },
+        isRegistered: false,
       });
     }
   } catch (error) {
@@ -61,6 +60,28 @@ app.post("/api/user/login", async (req, res) => {
   }
 });
 
+// Register User
+app.post("/api/user/register", async (req, res) => {
+  const { email, given_name, family_name, gender, weight, dob, pr } = req.body;
+  try {
+    const joined = new Date().toISOString();
+    await pool.query(
+      `INSERT INTO users (email, family_name, given_name, gender, weight, dob, pr, joined) 
+      VALUES ('${email}', '${family_name}', '${given_name}', '${gender}', '${weight}', '${dob}', '${JSON.stringify(
+        pr
+      )}','${joined}')`
+    );
+    res.json({
+      message: "new user added and successfully logged in",
+      user: { email, family_name, given_name, joined },
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Failed to register");
+  }
+});
+
+// Update User
 app.put("/api/user/updatePr", async (req, res) => {
   const { newPr, user } = req.body;
 
