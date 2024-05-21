@@ -9,8 +9,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 const bodyParser = require("body-parser");
-const { Pool } = require("pg");
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 var corsOptions = {
   origin: "*",
@@ -22,82 +20,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors(corsOptions));
 
-app.get("/api/getUsers", async (req, res) => {
-  try {
-    const data = await pool.query("SELECT * FROM users");
-    res.json(data.rows);
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Failed to retrieve users");
-  }
-});
-
-// User Login
-app.post("/api/user/login", async (req, res) => {
-  const { email, given_name, family_name } = req.body;
-  console.log(req.body);
-
-  try {
-    const data = await pool.query(
-      `SELECT * FROM users WHERE email = '${email}';`
-    ); // Check if the user already exists in the database
-    if (data.rows.length > 0) {
-      res.json({
-        message: "succefully logged in",
-        user: data.rows[0],
-        isRegistered: true,
-      });
-    } else {
-      res.json({
-        message: "need to register the user",
-        user: { email, given_name, family_name },
-        isRegistered: false,
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Failed to login");
-  }
-});
-
-// Register User
-app.post("/api/user/register", async (req, res) => {
-  const { email, given_name, family_name, gender, weight, dob, pr } = req.body;
-  try {
-    const joined = new Date().toISOString();
-    await pool.query(
-      `INSERT INTO users (email, family_name, given_name, gender, weight, dob, pr, joined) 
-      VALUES ('${email}', '${family_name}', '${given_name}', '${gender}', '${weight}', '${dob}', '${JSON.stringify(
-        pr
-      )}','${joined}')`
-    );
-    res.json({
-      message: "new user added and successfully logged in",
-      user: { email, family_name, given_name, joined },
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Failed to register");
-  }
-});
-
-// Update User
-app.put("/api/user/updatePr", async (req, res) => {
-  const { newPr, user } = req.body;
-
-  try {
-    await pool.query(`
-        UPDATE users SET pr = '${JSON.stringify(newPr)}' WHERE email = '${
-      user.email
-    }'
-    `);
-
-    res.send("User PR successfully updated");
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Failed to update the PR");
-  }
-});
+// Routes
+app.use("/api/user", require("./routes/user"));
 
 app.get("*", (req, res) => {
   console.log("test");
