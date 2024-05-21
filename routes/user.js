@@ -1,22 +1,22 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
-const jwt = require("jsonwebtoken");
-const { getUser } = require("../models/User.model");
-const verifyIdToken = require("../handler/verifyIdToken");
+const jwt = require('jsonwebtoken');
+const { getUser, registerUser } = require('../models/User.model');
+const verifyIdToken = require('../handler/verifyIdToken');
 
-router.post("/login", async (req, res) => {
+router.post('/login', async (req, res) => {
   const { user, token } = req.body;
   const { email, sub } = user;
 
-  // Validate Token
+  // Validate Google OAuth Token
   try {
     const verifiedSub = await verifyIdToken(token);
     if (verifiedSub !== sub) {
-      return res.status(403).send("Invalid Token");
+      return res.status(403).send('Invalid Token');
     }
   } catch (err) {
     console.log(err);
-    return res.status(403).send("Invalid Token");
+    return res.status(403).send('Invalid Token');
   }
 
   try {
@@ -26,66 +26,76 @@ router.post("/login", async (req, res) => {
       // sign in user
       if (user.email === email) {
         const token = jwt.sign({ data: user }, process.env.TOKEN_SECRET, {
-          expiresIn: "7d",
+          expiresIn: '7d',
         });
         return res.json({
-          message: "succefully logged in",
-          user,
-          token,
+          message: 'succefully logged in',
+          user: {
+            ...user,
+            token,
+          },
           registered: true,
         });
       } else {
         // User email does not match with OAuth 'sub'
-        return res.status(401).send("Unauthorized User");
+        return res.status(401).send('Unauthorized User');
       }
     } else {
       // Re-direct user to register page
-      const token = jwt.sign(
-        { data: "registering" },
+      const registeringToken = jwt.sign(
+        { data: { registering: true } },
         process.env.TOKEN_SECRET,
         {
-          expiresIn: "10m",
+          expiresIn: '10m',
         }
       );
       return res.json({
-        message: "need to register the user",
-        token,
-        user,
+        message: 'need to register the user',
+        user: {
+          ...user,
+          registeringToken,
+        },
         registered: false,
       });
     }
   } catch (error) {
     console.log(error);
-    return res.status(500).send("Failed to login");
+    return res.status(500).send('Failed to login');
   }
 });
 
 // Register User
-router.post("/register", async (req, res) => {
-  /************************************** 
-      register user with using 'sub' as user_id
-    **************************************/
-  const { email, given_name, family_name, gender, weight, dob, pr } = req.body;
-  try {
-    const joined = new Date().toISOString();
-    await pool.query(
-      `INSERT INTO users (email, family_name, given_name, gender, weight, dob, pr, joined) 
-        VALUES ('${email}', '${family_name}', '${given_name}', '${gender}', '${weight}', '${dob}', '${JSON.stringify(
-        pr
-      )}','${joined}')`
-    );
-    res.json({
-      message: "new user added and successfully logged in",
-      user: { email, family_name, given_name, joined },
-    });
-  } catch (error) {
-    console.log(error);
-    res.status(500).send("Failed to register");
+router.post('/register', async (req, res) => {
+  const { user, registeringToken } = req.body;
+
+  const decoded = jwt.verify(registeringToken, process.env.TOKEN_SECRET);
+
+  if (decoded.data.registering) {
+    try {
+      await registerUser(user);
+
+      const token = jwt.sign({ data: user }, process.env.TOKEN_SECRET, {
+        expiresIn: '7d',
+      });
+      return res.json({
+        message: 'succefully logged in',
+        user: {
+          ...user,
+          token,
+        },
+        registered: true,
+      });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send('Failed to register');
+    }
+  } else {
+    return res.status(403).send('Invalid Registering Token');
   }
 });
 
 // Update User
-router.put("/updatePr", async (req, res) => {
+router.put('/updatePr', async (req, res) => {
   const { newPr, user } = req.body;
 
   try {
@@ -95,10 +105,10 @@ router.put("/updatePr", async (req, res) => {
     }'
       `);
 
-    res.send("User PR successfully updated");
+    res.send('User PR successfully updated');
   } catch (error) {
     console.log(error);
-    res.status(500).send("Failed to update the PR");
+    res.status(500).send('Failed to update the PR');
   }
 });
 
