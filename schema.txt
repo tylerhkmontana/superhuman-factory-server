@@ -8,5 +8,6 @@ users (
     weight FLOAT4,
     dob DATE,
     pr JSONB,
-    joined DATE,
+    joined TIMESTAMP WITHOUT TIME ZONE,
+    updated TIMESTAMP WITHOUT TIME ZONE,
 )
