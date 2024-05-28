@@ -24,8 +24,8 @@ async function registerUser(user) {
     dob,
     pr,
     joined,
-    updated,
   } = user;
+
   try {
     const data = await db.query(
       `SELECT * FROM ${usersTable} WHERE sub = '${sub}';`

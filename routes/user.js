@@ -95,7 +95,7 @@ router.post("/register", async (req, res) => {
 
 // Update User
 router.put("/update", authorization, async (req, res) => {
-  const { newProfile, user } = req.body;
+  let { newProfile, user } = req.body;
   const updatedWhen = Date.now() - new Date(newProfile.updated).getTime();
   const twentyFourHours = 8.64e7;
 
@@ -105,6 +105,10 @@ router.put("/update", authorization, async (req, res) => {
     return res.status(500).send("Unauthorized User.");
   } else {
     try {
+      let rightNow = new Date();
+      rightNow = rightNow.toISOString();
+
+      newProfile.updated = rightNow;
       await updateUser(newProfile);
 
       const token = jwt.sign({ data: newProfile }, process.env.TOKEN_SECRET, {
