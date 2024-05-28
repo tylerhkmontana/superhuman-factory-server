@@ -1,5 +1,5 @@
 const db = require("../db/db");
-const usersTable = "users_test";
+const usersTable = "users";
 
 async function getUser(sub) {
   try {
