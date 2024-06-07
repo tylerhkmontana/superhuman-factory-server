@@ -22,6 +22,7 @@ app.use(cors(corsOptions));
 
 // Routes
 app.use("/api/user", require("./routes/user"));
+app.use("/api/program", require("./routes/program"));
 
 app.get("*", (req, res) => {
   console.log("test");

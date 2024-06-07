@@ -11,3 +11,56 @@ users (
     joined TIMESTAMP WITHOUT TIME ZONE,
     updated TIMESTAMP WITHOUT TIME ZONE,
 )
+
+programs (
+    id Primary Key NOT NULL,
+    authorId VARCHAR NOT NULL (sub_users),
+    name VARCHAR NOT NULL,
+    num_weeks SMALLINT NOT NULL,
+    routine JSONB NOT NULL,
+    created TIMESTAMP WITHOUT TIME ZONE,
+    updated TIMESTAMP WITHOUT TIME ZONE
+)
+
+
+// Sample 
+{
+    [
+        [
+            {
+                workout: 'bench',
+                sets: [
+                    {
+                    load: .65 * user.pr.bench,
+                    reps: 5
+                    },
+                     {
+                    load: .75 * user.pr.bench,
+                    reps: 5
+                    },
+                     {
+                    load: .85 * user.pr.bench,
+                    reps: 5+
+                    }
+                ]
+            },
+            {
+                workout: 'incline benchpress',
+                sets: [
+                    {
+                        load: 185,
+                        rep: until failure
+                    },
+                     {
+                        load: 185,
+                        rep: until failure
+                    },
+                     {
+                        load: 185,
+                        rep: until failure
+                    },
+                ]
+            }
+        ]
+    ]
+}
