@@ -15,9 +15,10 @@ users (
 programs (
     id Primary Key NOT NULL,
     authorId VARCHAR NOT NULL (sub_users),
-    name VARCHAR NOT NULL,
+    title VARCHAR NOT NULL,
     num_weeks SMALLINT NOT NULL,
     routine JSONB NOT NULL,
+    training_goal TEXT NOT NULL,
     created TIMESTAMP WITHOUT TIME ZONE,
     updated TIMESTAMP WITHOUT TIME ZONE
 )
