@@ -16,21 +16,6 @@ async function getPremadePrograms() {
   }
 }
 
-async function createProgram(program) {
-  let { authorId, title, num_weeks, training_goal } = program;
-  [title, training_goal] = escapeQuote([title, training_goal]);
-  let rightNow = new Date();
-  rightNow = rightNow.toISOString();
-
-  try {
-    await db.query(`INSERT INTO ${programsTable} (authorId, title, num_weeks, routine, updated, created, training_goal)
-    VALUES ('${authorId}', '${title}', '${num_weeks}', '{}', '${rightNow}', '${rightNow}', '${training_goal}')`);
-  } catch (error) {
-    console.log(error);
-    throw error;
-  }
-}
-
 async function getCustomPrograms(authorId) {
   console.log(authorId);
   try {
@@ -46,4 +31,33 @@ async function getCustomPrograms(authorId) {
   }
 }
 
-module.exports = { getPremadePrograms, createProgram, getCustomPrograms };
+async function createProgram(program) {
+  let { authorId, title, num_weeks, training_goal } = program;
+  [title, training_goal] = escapeQuote([title, training_goal]);
+  let rightNow = new Date();
+  rightNow = rightNow.toISOString();
+
+  try {
+    await db.query(`INSERT INTO ${programsTable} (authorId, title, num_weeks, routine, updated, created, training_goal)
+    VALUES ('${authorId}', '${title}', '${num_weeks}', '{}', '${rightNow}', '${rightNow}', '${training_goal}')`);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+async function deleteProgram(programId, userId) {
+  try {
+    await db.query(``);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+module.exports = {
+  getPremadePrograms,
+  createProgram,
+  getCustomPrograms,
+  deleteProgram,
+};

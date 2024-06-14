@@ -42,6 +42,15 @@ router.post("/create", authorization, async (req, res) => {
   }
 });
 
+router.delete("/delete", authorization, (req, res) => {
+  const { programId } = req.body;
+  const { userId } = req.body.user.sub;
+
+  console.log(programId, userId);
+
+  return res.send("Good");
+});
+
 router.put("/update", authorization, (req, res) => {
   // Update the Program
 });
