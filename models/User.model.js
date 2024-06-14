@@ -1,5 +1,6 @@
 const db = require("../db/db");
 const usersTable = "users";
+const escapeQuote = require("../utils/escapeQuote");
 
 async function getUser(sub) {
   try {
@@ -14,17 +15,10 @@ async function getUser(sub) {
 }
 
 async function registerUser(user) {
-  const {
-    sub,
-    email,
-    given_name,
-    family_name,
-    gender,
-    weight,
-    dob,
-    pr,
-    joined,
-  } = user;
+  let { sub, email, given_name, family_name, gender, weight, dob, pr, joined } =
+    user;
+
+  [given_name, family_name] = escapeQuote([given_name, family_name]);
 
   try {
     const data = await db.query(
@@ -47,8 +41,10 @@ async function registerUser(user) {
 }
 
 async function updateUser(newProfile) {
-  const { sub, given_name, family_name, gender, weight, dob, pr, updated } =
+  let { sub, given_name, family_name, gender, weight, dob, pr, updated } =
     newProfile;
+
+  [given_name, family_name] = escapeQuote([given_name, family_name]);
 
   try {
     await db.query(`

@@ -1,27 +1,45 @@
 const express = require("express");
 const router = express.Router();
 const { authorization } = require("../handler/authHandler");
-const { getPremadePrograms } = require("../models/Program.model");
+const {
+  getPremadePrograms,
+  createProgram,
+  getCustomPrograms,
+} = require("../models/Program.model");
 
-router.get("/premade", async (req, res) => {
+router.get("/", async (req, res) => {
   // Get all the premade programs
+  const { authorId } = req.query;
   try {
     const premadePrograms = await getPremadePrograms();
+    const customPrograms = await getCustomPrograms(authorId);
 
-    res.json(premadePrograms.rows);
+    return res.json({
+      premade: premadePrograms,
+      custom: customPrograms,
+    });
   } catch (error) {
     console.log(error);
     return res.status(500).send("Failed to fetch premade programs data.");
   }
 });
 
-router.get("/custom", (req, res) => {
-  // Get custom programs based on userid
-});
-
-router.post("/create", authorization, (req, res) => {
+router.post("/create", authorization, async (req, res) => {
   // Create a Program
-  return res.send("");
+  const { program, user } = req.body;
+  program.authorId = user.sub;
+
+  /* 
+  Make logic to limit 3 custom programs per user
+ */
+  try {
+    await createProgram(program);
+    const customPrograms = await getCustomPrograms(user.sub);
+    return res.status(200).json(customPrograms);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Failed to create the program");
+  }
 });
 
 router.put("/update", authorization, (req, res) => {
