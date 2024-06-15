@@ -30,9 +30,17 @@ router.post("/create", authorization, async (req, res) => {
   const { program, user } = req.body;
   program.authorId = user.sub;
 
-  /* 
-  Make logic to limit 3 custom programs per user
- */
+  try {
+    const customPrograms = await getCustomPrograms(authorId);
+    if (customPrograms.length >= 3) {
+      return res
+        .status(500)
+        .send("A user cannot create more than 3 custom programs");
+    }
+  } catch (error) {
+    console.log(error);
+  }
+
   try {
     await createProgram(program);
     const customPrograms = await getCustomPrograms(user.sub);
