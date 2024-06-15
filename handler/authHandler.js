@@ -16,6 +16,7 @@ async function verifyIdToken(token) {
 
 function authorization(req, res, next) {
   const { user } = req.body;
+  console.log(user);
 
   // Check if the token is valid
   try {

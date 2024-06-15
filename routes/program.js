@@ -5,6 +5,7 @@ const {
   getPremadePrograms,
   createProgram,
   getCustomPrograms,
+  deleteProgram,
 } = require("../models/Program.model");
 
 router.get("/", async (req, res) => {
@@ -35,20 +36,25 @@ router.post("/create", authorization, async (req, res) => {
   try {
     await createProgram(program);
     const customPrograms = await getCustomPrograms(user.sub);
-    return res.status(200).json(customPrograms);
+    return res.json(customPrograms);
   } catch (error) {
     console.log(error);
     return res.status(500).send("Failed to create the program");
   }
 });
 
-router.delete("/delete", authorization, (req, res) => {
+router.delete("/delete", authorization, async (req, res) => {
   const { programId } = req.body;
-  const { userId } = req.body.user.sub;
+  const userId = req.body.user.sub;
 
-  console.log(programId, userId);
+  try {
+    await deleteProgram(programId, userId);
 
-  return res.send("Good");
+    return res.send("Successfully deleted");
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Failed to delete the program");
+  }
 });
 
 router.put("/update", authorization, (req, res) => {

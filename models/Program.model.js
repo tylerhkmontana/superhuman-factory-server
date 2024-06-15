@@ -17,13 +17,11 @@ async function getPremadePrograms() {
 }
 
 async function getCustomPrograms(authorId) {
-  console.log(authorId);
   try {
     const data = await db.query(
       `SELECT * FROM ${programsTable} WHERE authorId = '${authorId}';`
     );
 
-    console.log(data);
     return data.rows;
   } catch (error) {
     console.log(error);
@@ -46,12 +44,18 @@ async function createProgram(program) {
   }
 }
 
-async function deleteProgram(programId, userId) {
-  try {
-    await db.query(``);
-  } catch (error) {
-    console.log(error);
-    throw error;
+async function deleteProgram(programId, authorId) {
+  if (authorId === "admin") {
+    throw new Error("Not authorized to delete the program");
+  } else {
+    try {
+      await db.query(
+        `DELETE FROM ${programsTable} WHERE authorId = '${authorId}' AND id = '${programId}'`
+      );
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 }
 
