@@ -25,6 +25,14 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/:authorId", (req, res) => {
+  const { authorId } = req.params;
+
+  console.log(authorId);
+
+  return res.send("good");
+});
+
 router.post("/create", authorization, async (req, res) => {
   // Create a Program
   const { program, user } = req.body;
