@@ -6,6 +6,7 @@ const {
   createProgram,
   getCustomPrograms,
   deleteProgram,
+  getProgram,
 } = require("../models/Program.model");
 
 router.get("/", async (req, res) => {
@@ -25,12 +26,17 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.get("/:authorId", (req, res) => {
-  const { authorId } = req.params;
+router.get("/:programId", async (req, res) => {
+  const { programId } = req.params;
 
-  console.log(authorId);
+  try {
+    const program = await getProgram(programId);
 
-  return res.send("good");
+    return res.json(program);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Failed to fetch the custom program");
+  }
 });
 
 router.post("/create", authorization, async (req, res) => {

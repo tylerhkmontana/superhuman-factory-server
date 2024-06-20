@@ -29,6 +29,19 @@ async function getCustomPrograms(authorId) {
   }
 }
 
+async function getProgram(programId) {
+  try {
+    const data = await db.query(
+      `SELECT * FROM ${programsTable} WHERE id = '${programId}' LIMIT 1`
+    );
+
+    return data.rows;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
 async function createProgram(program) {
   let { authorId, title, num_weeks, training_goal, routine } = program;
   [title, training_goal] = escapeQuote([title, training_goal]);
@@ -66,4 +79,5 @@ module.exports = {
   createProgram,
   getCustomPrograms,
   deleteProgram,
+  getProgram,
 };
