@@ -5,16 +5,17 @@ const {
   getPremadePrograms,
   createProgram,
   getCustomPrograms,
-  deleteProgram,
   getProgram,
+  updateProgramRoutine,
+  deleteProgram,
 } = require("../models/Program.model");
 
 router.get("/", async (req, res) => {
   // Get all the premade programs
-  const { authorId } = req.query;
+  const { authorid } = req.query;
   try {
     const premadePrograms = await getPremadePrograms();
-    const customPrograms = await getCustomPrograms(authorId);
+    const customPrograms = await getCustomPrograms(authorid);
 
     return res.json({
       premade: premadePrograms,
@@ -42,10 +43,10 @@ router.get("/:programId", async (req, res) => {
 router.post("/create", authorization, async (req, res) => {
   // Create a Program
   const { program, user } = req.body;
-  program.authorId = user.sub;
+  program.authorid = user.sub;
 
   try {
-    const customPrograms = await getCustomPrograms(authorId);
+    const customPrograms = await getCustomPrograms(authorid);
     if (customPrograms.length >= 3) {
       return res
         .status(500)
@@ -65,8 +66,21 @@ router.post("/create", authorization, async (req, res) => {
   }
 });
 
-router.delete("/delete", authorization, async (req, res) => {
-  const { programId } = req.body;
+router.put("/update/routine", authorization, async (req, res) => {
+  const { program, user } = req.body;
+  const userId = user.sub;
+
+  try {
+    const updatedProgram = await updateProgramRoutine(program, userId);
+    return res.json(updatedProgram);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Failed to update the program");
+  }
+});
+
+router.delete("/delete/:programId", authorization, async (req, res) => {
+  const { programId } = req.query;
   const userId = req.body.user.sub;
 
   try {
@@ -77,10 +91,6 @@ router.delete("/delete", authorization, async (req, res) => {
     console.log(error);
     return res.status(500).send("Failed to delete the program");
   }
-});
-
-router.put("/update", authorization, (req, res) => {
-  // Update the Program
 });
 
 module.exports = router;
