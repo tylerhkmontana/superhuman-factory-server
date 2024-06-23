@@ -80,7 +80,8 @@ router.put("/update/routine", authorization, async (req, res) => {
 });
 
 router.delete("/delete/:programId", authorization, async (req, res) => {
-  const { programId } = req.query;
+  const { programId } = req.params;
+  console.log(programId);
   const userId = req.body.user.sub;
 
   try {
